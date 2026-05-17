@@ -1,4 +1,6 @@
 const APP_STORAGE_KEY = "duality.preferences.v1";
+const MOMENTS_STORAGE_KEY = "duality.moments.v1";
+const MAX_MOMENTS = 120;
 
 const THEME_CONFIG = {
   themeName: "CrimsonCouples_NeoNoir",
@@ -179,9 +181,43 @@ const TRANSLATIONS = {
     moduleNotesTitle: "Notas",
     moduleNotesDesc: "Espacio colaborativo para ideas y acuerdos.",
     pillSoon: "Proximamente",
+    pillActive: "Activo",
     installButton: "Instalar app",
     footerNote: "Base inicial lista para modulos funcionales y despliegue.",
     customizeTitle: "Personalizacion",
+    momentsPanelTitle: "Momentos",
+    momentsPanelCopy: "Guarda fotos, frases y notas para inmortalizar su historia.",
+    momentsTitleLabel: "Titulo del momento",
+    momentsTitlePlaceholder: "Cena bajo lluvia",
+    momentsDateLabel: "Fecha y hora",
+    momentsMoodLabel: "Estado",
+    moodJoy: "Alegre",
+    moodCalm: "Calma",
+    moodPassion: "Pasion",
+    moodNostalgia: "Nostalgia",
+    moodDream: "Sueno",
+    momentsPhraseLabel: "Frase corta",
+    momentsPhrasePlaceholder: "Nos elegimos incluso en dias dificiles",
+    momentsNoteLabel: "Nota para el recuerdo",
+    momentsNotePlaceholder: "Hoy nos regalamos tiempo de calidad",
+    momentsPhotoLabel: "Foto opcional",
+    momentsRemovePhoto: "Quitar foto",
+    momentsImmortalLabel: "Inmortalizar este momento",
+    momentsSaveButton: "Guardar momento",
+    momentsTimelineLabel: "Timeline",
+    momentsFilterAll: "Todo",
+    momentsFilterImmortal: "Inmortales",
+    momentsEmpty: "Aun no hay momentos. Crea el primero.",
+    momentsEmptyImmortal: "No hay momentos inmortales aun.",
+    momentsDelete: "Eliminar",
+    momentsImmortalize: "Inmortalizar",
+    momentsUnpin: "Quitar inmortal",
+    momentToastSaved: "Momento guardado.",
+    momentToastRemoved: "Momento eliminado.",
+    momentToastPinned: "Momento inmortalizado.",
+    momentToastUnpinned: "Momento retirado de inmortales.",
+    momentToastMissingData: "Completa titulo y fecha para guardar.",
+    momentToastPhotoError: "No se pudo procesar la foto.",
     saveSettings: "Guardar cambios",
     toastWelcome: "Duality quedo lista para ustedes.",
     toastSaved: "Preferencias actualizadas.",
@@ -222,9 +258,43 @@ const TRANSLATIONS = {
     moduleNotesTitle: "Notes",
     moduleNotesDesc: "Collaborative space for ideas and agreements.",
     pillSoon: "Coming soon",
+    pillActive: "Active",
     installButton: "Install app",
     footerNote: "Initial baseline ready for functional modules and deployment.",
     customizeTitle: "Customization",
+    momentsPanelTitle: "Moments",
+    momentsPanelCopy: "Save photos, quotes, and notes to immortalize your story.",
+    momentsTitleLabel: "Moment title",
+    momentsTitlePlaceholder: "Dinner under the rain",
+    momentsDateLabel: "Date and time",
+    momentsMoodLabel: "Mood",
+    moodJoy: "Joy",
+    moodCalm: "Calm",
+    moodPassion: "Passion",
+    moodNostalgia: "Nostalgia",
+    moodDream: "Dream",
+    momentsPhraseLabel: "Short quote",
+    momentsPhrasePlaceholder: "We choose each other even on hard days",
+    momentsNoteLabel: "Memory note",
+    momentsNotePlaceholder: "Today we gave each other quality time",
+    momentsPhotoLabel: "Optional photo",
+    momentsRemovePhoto: "Remove photo",
+    momentsImmortalLabel: "Immortalize this moment",
+    momentsSaveButton: "Save moment",
+    momentsTimelineLabel: "Timeline",
+    momentsFilterAll: "All",
+    momentsFilterImmortal: "Immortal",
+    momentsEmpty: "No moments yet. Create the first one.",
+    momentsEmptyImmortal: "No immortal moments yet.",
+    momentsDelete: "Delete",
+    momentsImmortalize: "Immortalize",
+    momentsUnpin: "Unmark immortal",
+    momentToastSaved: "Moment saved.",
+    momentToastRemoved: "Moment deleted.",
+    momentToastPinned: "Moment immortalized.",
+    momentToastUnpinned: "Moment removed from immortal list.",
+    momentToastMissingData: "Please complete title and date.",
+    momentToastPhotoError: "Could not process the photo.",
     saveSettings: "Save changes",
     toastWelcome: "Duality is ready for both of you.",
     toastSaved: "Preferences updated.",
@@ -246,6 +316,11 @@ const DEFAULT_STATE = {
 };
 
 const state = loadState();
+let moments = loadMoments();
+const uiState = {
+  momentFilter: "all",
+  momentImageData: ""
+};
 let deferredInstallPrompt = null;
 
 const elements = {
@@ -265,6 +340,23 @@ const elements = {
   openCustomize: document.getElementById("open-customize"),
   customizeSheet: document.getElementById("customize-sheet"),
   closeCustomize: document.getElementById("close-customize"),
+  openMomentsModule: document.getElementById("open-moments-module"),
+  momentsSheet: document.getElementById("moments-sheet"),
+  closeMoments: document.getElementById("close-moments"),
+  momentForm: document.getElementById("moment-form"),
+  momentTitle: document.getElementById("moment-title"),
+  momentDateTime: document.getElementById("moment-datetime"),
+  momentMood: document.getElementById("moment-mood"),
+  momentPhrase: document.getElementById("moment-phrase"),
+  momentNote: document.getElementById("moment-note"),
+  momentImage: document.getElementById("moment-image"),
+  momentImagePreview: document.getElementById("moment-image-preview"),
+  momentImageThumb: document.getElementById("moment-image-thumb"),
+  removeMomentImage: document.getElementById("remove-moment-image"),
+  momentImmortal: document.getElementById("moment-immortal"),
+  momentFilterAll: document.getElementById("moment-filter-all"),
+  momentFilterImmortal: document.getElementById("moment-filter-immortal"),
+  momentsList: document.getElementById("moments-list"),
   editUserName: document.getElementById("edit-user-name"),
   editPartnerName: document.getElementById("edit-partner-name"),
   editLanguage: document.getElementById("edit-language"),
@@ -282,6 +374,9 @@ function init() {
   applyLanguage();
   renderNames();
   syncFormValues();
+  setMomentDefaultDateTime();
+  updateMomentFilterButtons();
+  renderMoments();
   refreshOnboardingVisibility();
   registerServiceWorker();
 }
@@ -363,6 +458,58 @@ function bindEvents() {
   });
 
   elements.closeCustomize.addEventListener("click", closeCustomizeSheet);
+
+  elements.openMomentsModule.addEventListener("click", openMomentsSheet);
+  elements.openMomentsModule.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openMomentsSheet();
+    }
+  });
+
+  elements.closeMoments.addEventListener("click", closeMomentsSheet);
+  elements.momentsSheet.addEventListener("click", (event) => {
+    if (event.target === elements.momentsSheet) {
+      closeMomentsSheet();
+    }
+  });
+
+  elements.momentForm.addEventListener("submit", onMomentSubmit);
+  elements.momentImage.addEventListener("change", onMomentImageChange);
+  elements.removeMomentImage.addEventListener("click", clearMomentImageSelection);
+
+  elements.momentFilterAll.addEventListener("click", () => {
+    uiState.momentFilter = "all";
+    updateMomentFilterButtons();
+    renderMoments();
+  });
+
+  elements.momentFilterImmortal.addEventListener("click", () => {
+    uiState.momentFilter = "immortal";
+    updateMomentFilterButtons();
+    renderMoments();
+  });
+
+  elements.momentsList.addEventListener("click", (event) => {
+    const trigger = event.target.closest("button[data-moment-action]");
+    if (!trigger) {
+      return;
+    }
+
+    const momentId = Number(trigger.dataset.momentId);
+    if (!Number.isFinite(momentId)) {
+      return;
+    }
+
+    if (trigger.dataset.momentAction === "delete") {
+      deleteMoment(momentId);
+      return;
+    }
+
+    if (trigger.dataset.momentAction === "immortal") {
+      toggleMomentImmortal(momentId);
+    }
+  });
 
   elements.customizeSheet.addEventListener("click", (event) => {
     if (event.target === elements.customizeSheet) {
@@ -452,6 +599,18 @@ function closeCustomizeSheet() {
   elements.customizeSheet.setAttribute("aria-hidden", "true");
 }
 
+function openMomentsSheet() {
+  setMomentDefaultDateTime();
+  elements.momentsSheet.classList.add("open");
+  elements.momentsSheet.setAttribute("aria-hidden", "false");
+  renderMoments();
+}
+
+function closeMomentsSheet() {
+  elements.momentsSheet.classList.remove("open");
+  elements.momentsSheet.setAttribute("aria-hidden", "true");
+}
+
 function refreshOnboardingVisibility() {
   if (state.onboarded) {
     elements.onboardingScreen.classList.add("hidden");
@@ -496,8 +655,10 @@ function applyLanguage() {
   elements.themeToggle.textContent = state.mode === "dark" ? dictionary.modeDarkShort : dictionary.modeLightShort;
   elements.openCustomize.textContent = dictionary.tuneShort;
   elements.closeCustomize.textContent = state.language === "es" ? "Cerrar" : "Close";
+  elements.closeMoments.textContent = state.language === "es" ? "Cerrar" : "Close";
 
   renderNames();
+  renderMoments();
 }
 
 function applyTheme() {
@@ -565,6 +726,225 @@ function syncFormValues() {
   syncSegmentedStates();
 }
 
+function setMomentDefaultDateTime() {
+  if (elements.momentDateTime.value) {
+    return;
+  }
+
+  const now = new Date();
+  const dateValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  elements.momentDateTime.value = dateValue;
+}
+
+async function onMomentImageChange() {
+  const file = elements.momentImage.files && elements.momentImage.files[0];
+  if (!file) {
+    clearMomentImageSelection();
+    return;
+  }
+
+  try {
+    uiState.momentImageData = await imageFileToDataUrl(file);
+    elements.momentImageThumb.src = uiState.momentImageData;
+    elements.momentImagePreview.hidden = false;
+  } catch (error) {
+    console.warn("Failed to parse image", error);
+    clearMomentImageSelection();
+    showToast(t("momentToastPhotoError"));
+  }
+}
+
+function clearMomentImageSelection() {
+  uiState.momentImageData = "";
+  elements.momentImage.value = "";
+  elements.momentImageThumb.removeAttribute("src");
+  elements.momentImagePreview.hidden = true;
+}
+
+function onMomentSubmit(event) {
+  event.preventDefault();
+
+  const title = String(elements.momentTitle.value || "").trim();
+  const dateTime = elements.momentDateTime.value;
+  const mood = elements.momentMood.value;
+
+  if (!title || !dateTime) {
+    showToast(t("momentToastMissingData"));
+    return;
+  }
+
+  const entry = {
+    id: Date.now(),
+    title,
+    dateTime,
+    mood,
+    phrase: String(elements.momentPhrase.value || "").trim(),
+    note: String(elements.momentNote.value || "").trim(),
+    immortal: elements.momentImmortal.checked,
+    imageData: uiState.momentImageData,
+    createdAt: new Date().toISOString()
+  };
+
+  moments = [entry, ...moments]
+    .sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime())
+    .slice(0, MAX_MOMENTS);
+
+  saveMoments();
+  elements.momentForm.reset();
+  clearMomentImageSelection();
+  elements.momentMood.value = "joy";
+  elements.momentDateTime.value = "";
+  setMomentDefaultDateTime();
+  renderMoments();
+  showToast(t("momentToastSaved"));
+}
+
+function updateMomentFilterButtons() {
+  elements.momentFilterAll.classList.toggle("active", uiState.momentFilter === "all");
+  elements.momentFilterImmortal.classList.toggle("active", uiState.momentFilter === "immortal");
+}
+
+function renderMoments() {
+  elements.momentsList.innerHTML = "";
+
+  const list = uiState.momentFilter === "immortal"
+    ? moments.filter((item) => item.immortal)
+    : moments;
+
+  if (!list.length) {
+    const empty = document.createElement("div");
+    empty.className = "moment-empty";
+    empty.textContent = uiState.momentFilter === "immortal" ? t("momentsEmptyImmortal") : t("momentsEmpty");
+    elements.momentsList.appendChild(empty);
+    return;
+  }
+
+  list.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = item.immortal ? "moment-item immortal" : "moment-item";
+
+    const head = document.createElement("div");
+    head.className = "moment-item-head";
+
+    const meta = document.createElement("div");
+
+    const title = document.createElement("h4");
+    title.className = "moment-title";
+    title.textContent = item.title;
+
+    const date = document.createElement("p");
+    date.className = "moment-date";
+    date.textContent = formatMomentDate(item.dateTime);
+
+    meta.appendChild(title);
+    meta.appendChild(date);
+
+    const mood = document.createElement("span");
+    mood.className = "moment-chip";
+    mood.textContent = moodLabel(item.mood);
+
+    head.appendChild(meta);
+    head.appendChild(mood);
+    card.appendChild(head);
+
+    if (item.imageData) {
+      const image = document.createElement("img");
+      image.className = "moment-photo";
+      image.src = item.imageData;
+      image.alt = item.title;
+      card.appendChild(image);
+    }
+
+    if (item.phrase) {
+      const phrase = document.createElement("p");
+      phrase.className = "moment-phrase";
+      phrase.textContent = `"${item.phrase}"`;
+      card.appendChild(phrase);
+    }
+
+    if (item.note) {
+      const note = document.createElement("p");
+      note.className = "moment-note";
+      note.textContent = item.note;
+      card.appendChild(note);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "moment-actions";
+
+    const immortalButton = document.createElement("button");
+    immortalButton.type = "button";
+    immortalButton.className = "moment-action";
+    immortalButton.dataset.momentAction = "immortal";
+    immortalButton.dataset.momentId = String(item.id);
+    immortalButton.textContent = item.immortal ? t("momentsUnpin") : t("momentsImmortalize");
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "moment-action";
+    deleteButton.dataset.momentAction = "delete";
+    deleteButton.dataset.momentId = String(item.id);
+    deleteButton.textContent = t("momentsDelete");
+
+    actions.appendChild(immortalButton);
+    actions.appendChild(deleteButton);
+    card.appendChild(actions);
+
+    elements.momentsList.appendChild(card);
+  });
+}
+
+function formatMomentDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(state.language, {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(date);
+}
+
+function moodLabel(mood) {
+  const map = {
+    joy: "moodJoy",
+    calm: "moodCalm",
+    passion: "moodPassion",
+    nostalgia: "moodNostalgia",
+    dream: "moodDream"
+  };
+
+  return t(map[mood] || "moodCalm");
+}
+
+function deleteMoment(momentId) {
+  moments = moments.filter((item) => item.id !== momentId);
+  saveMoments();
+  renderMoments();
+  showToast(t("momentToastRemoved"));
+}
+
+function toggleMomentImmortal(momentId) {
+  let nextImmortalState = false;
+
+  moments = moments.map((item) => {
+    if (item.id !== momentId) {
+      return item;
+    }
+
+    nextImmortalState = !item.immortal;
+    return {
+      ...item,
+      immortal: nextImmortalState
+    };
+  });
+
+  saveMoments();
+  renderMoments();
+  showToast(nextImmortalState ? t("momentToastPinned") : t("momentToastUnpinned"));
+}
+
 function syncSegmentedStates() {
   document.querySelectorAll("[data-style]").forEach((button) => {
     button.classList.toggle("active", button.dataset.style === state.style);
@@ -620,6 +1000,78 @@ function setCssVar(name, value) {
 function t(key) {
   const dictionary = TRANSLATIONS[state.language] || TRANSLATIONS.es;
   return dictionary[key] || TRANSLATIONS.es[key] || key;
+}
+
+function loadMoments() {
+  try {
+    const raw = localStorage.getItem(MOMENTS_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .filter((item) => item && typeof item === "object")
+      .map((item) => ({
+        id: Number(item.id) || Date.now(),
+        title: String(item.title || ""),
+        dateTime: String(item.dateTime || ""),
+        mood: String(item.mood || "calm"),
+        phrase: String(item.phrase || ""),
+        note: String(item.note || ""),
+        immortal: Boolean(item.immortal),
+        imageData: String(item.imageData || ""),
+        createdAt: String(item.createdAt || "")
+      }))
+      .slice(0, MAX_MOMENTS);
+  } catch (error) {
+    console.warn("Failed to load moments", error);
+    return [];
+  }
+}
+
+function saveMoments() {
+  localStorage.setItem(MOMENTS_STORAGE_KEY, JSON.stringify(moments));
+}
+
+function imageFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => reject(new Error("read_failed"));
+    reader.onload = () => {
+      const image = new Image();
+
+      image.onerror = () => reject(new Error("image_decode_failed"));
+      image.onload = () => {
+        const maxSize = 1280;
+        const ratio = Math.min(1, maxSize / Math.max(image.width, image.height));
+        const width = Math.max(1, Math.round(image.width * ratio));
+        const height = Math.max(1, Math.round(image.height * ratio));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+          reject(new Error("canvas_context_failed"));
+          return;
+        }
+
+        context.drawImage(image, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+
+      image.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 function loadState() {

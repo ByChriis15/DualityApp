@@ -396,6 +396,19 @@ select:focus {
   padding: 0.82rem;
 }
 
+.module-card-active {
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.module-card-active:hover,
+.module-card-active:focus-visible {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary-accent) 55%, var(--border-glass));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--glow-effect) 20%, transparent);
+  outline: none;
+}
+
 .module-card h3 {
   margin: 0.4rem 0 0.16rem;
   font-family: var(--font-header);
@@ -450,6 +463,24 @@ select:focus {
   transition: opacity 220ms ease;
 }
 
+.moments-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 26;
+  display: grid;
+  place-items: end center;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.moments-sheet.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .customize-sheet.open {
   opacity: 1;
   pointer-events: auto;
@@ -460,6 +491,169 @@ select:focus {
   padding: 0.95rem;
   transform: translateY(22px);
   transition: transform 260ms ease;
+}
+
+.moments-card {
+  width: min(100%, 44rem);
+  max-height: 92dvh;
+  overflow: auto;
+  padding-bottom: calc(1rem + var(--safe-bottom));
+}
+
+.moment-form {
+  margin-top: 0.45rem;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid var(--border-glass);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--text-primary);
+  padding: 0.74rem 0.8rem;
+  outline: none;
+  resize: vertical;
+  min-height: 6.2rem;
+}
+
+textarea:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-accent) 25%, transparent);
+}
+
+.checkbox-row {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.checkbox-row input {
+  width: auto;
+}
+
+.moment-image-preview {
+  margin-top: 0.65rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  padding: 0.6rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.moment-image-preview img {
+  width: 100%;
+  max-height: 12.8rem;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.btn-secondary.slim {
+  width: auto;
+  justify-self: start;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.moments-toolbar {
+  margin-top: 1rem;
+}
+
+.moments-list {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.62rem;
+}
+
+.moment-item {
+  border: 1px solid var(--border-glass);
+  border-radius: 1rem;
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+}
+
+.moment-item.immortal {
+  box-shadow: 0 0 26px color-mix(in srgb, var(--glow-effect) 25%, transparent);
+  border-color: color-mix(in srgb, var(--primary-accent) 65%, var(--border-glass));
+}
+
+.moment-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.moment-title {
+  margin: 0;
+  font-family: var(--font-header);
+  font-size: 1rem;
+}
+
+.moment-date {
+  margin: 0.15rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.77rem;
+}
+
+.moment-chip {
+  border: 1px solid var(--border-glass);
+  border-radius: 999px;
+  padding: 0.22rem 0.45rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.moment-photo {
+  margin-top: 0.6rem;
+  width: 100%;
+  max-height: 15rem;
+  object-fit: cover;
+  border-radius: 0.8rem;
+}
+
+.moment-phrase {
+  margin: 0.62rem 0 0;
+  color: color-mix(in srgb, var(--primary-accent) 80%, var(--text-primary));
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.moment-note {
+  margin: 0.4rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.moment-actions {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.45rem;
+}
+
+.moment-action {
+  border: 1px solid var(--border-glass);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  color: var(--text-primary);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  padding: 0.34rem 0.58rem;
+  cursor: pointer;
+}
+
+.moment-empty {
+  border: 1px dashed var(--border-glass);
+  border-radius: 1rem;
+  padding: 0.85rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
 }
 
 .customize-sheet.open .sheet-card {

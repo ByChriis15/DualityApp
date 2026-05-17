@@ -94,11 +94,11 @@
       </section>
 
       <section class="modules-grid" aria-label="Modulos iniciales">
-        <article class="module-card reveal">
+        <article class="module-card module-card-active reveal" id="open-moments-module" role="button" tabindex="0" aria-label="Abrir modulo de momentos">
           <p class="module-icon" aria-hidden="true">H</p>
           <h3 data-i18n="moduleMomentsTitle">Momentos</h3>
           <p data-i18n="moduleMomentsDesc">Timeline privado para recuerdos compartidos.</p>
-          <span class="pill" data-i18n="pillSoon">Proximamente</span>
+          <span class="pill" data-i18n="pillActive">Activo</span>
         </article>
         <article class="module-card reveal">
           <p class="module-icon" aria-hidden="true">G</p>
@@ -166,6 +166,69 @@
       </div>
 
       <button class="btn-primary" id="save-customize" data-i18n="saveSettings">Guardar cambios</button>
+    </div>
+  </aside>
+
+  <aside class="moments-sheet" id="moments-sheet" aria-label="Modulo de momentos" aria-hidden="true">
+    <div class="sheet-card glass-card moments-card">
+      <div class="sheet-header">
+        <h3 data-i18n="momentsPanelTitle">Momentos</h3>
+        <button id="close-moments" class="icon-btn" aria-label="Cerrar">Close</button>
+      </div>
+
+      <p class="panel-copy" data-i18n="momentsPanelCopy">Guarda fotos, frases y notas para inmortalizar su historia.</p>
+
+      <form id="moment-form" class="moment-form" novalidate>
+        <label class="field-label" for="moment-title" data-i18n="momentsTitleLabel">Titulo del momento</label>
+        <input id="moment-title" name="title" type="text" maxlength="60" required data-i18n-placeholder="momentsTitlePlaceholder" placeholder="Cena bajo lluvia">
+
+        <div class="sheet-row">
+          <div>
+            <label class="field-label" for="moment-datetime" data-i18n="momentsDateLabel">Fecha y hora</label>
+            <input id="moment-datetime" name="dateTime" type="datetime-local" required>
+          </div>
+          <div>
+            <label class="field-label" for="moment-mood" data-i18n="momentsMoodLabel">Estado</label>
+            <select id="moment-mood" name="mood">
+              <option value="joy" data-i18n="moodJoy">Alegre</option>
+              <option value="calm" data-i18n="moodCalm">Calma</option>
+              <option value="passion" data-i18n="moodPassion">Pasion</option>
+              <option value="nostalgia" data-i18n="moodNostalgia">Nostalgia</option>
+              <option value="dream" data-i18n="moodDream">Sueno</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label" for="moment-phrase" data-i18n="momentsPhraseLabel">Frase corta</label>
+        <input id="moment-phrase" name="phrase" type="text" maxlength="90" data-i18n-placeholder="momentsPhrasePlaceholder" placeholder="Nos elegimos incluso en dias dificiles">
+
+        <label class="field-label" for="moment-note" data-i18n="momentsNoteLabel">Nota para el recuerdo</label>
+        <textarea id="moment-note" name="note" rows="3" maxlength="420" data-i18n-placeholder="momentsNotePlaceholder" placeholder="Hoy nos regalamos tiempo de calidad"></textarea>
+
+        <label class="field-label" for="moment-image" data-i18n="momentsPhotoLabel">Foto opcional</label>
+        <input id="moment-image" name="image" type="file" accept="image/*">
+        <div class="moment-image-preview" id="moment-image-preview" hidden>
+          <img id="moment-image-thumb" alt="Vista previa de foto del momento">
+          <button id="remove-moment-image" class="btn-secondary slim" type="button" data-i18n="momentsRemovePhoto">Quitar foto</button>
+        </div>
+
+        <label class="checkbox-row" for="moment-immortal">
+          <input id="moment-immortal" name="immortal" type="checkbox">
+          <span data-i18n="momentsImmortalLabel">Inmortalizar este momento</span>
+        </label>
+
+        <button class="btn-primary" type="submit" data-i18n="momentsSaveButton">Guardar momento</button>
+      </form>
+
+      <div class="moments-toolbar">
+        <p class="field-label" data-i18n="momentsTimelineLabel">Timeline</p>
+        <div class="segmented compact">
+          <button type="button" class="segmented-btn active" id="moment-filter-all" data-i18n="momentsFilterAll">Todo</button>
+          <button type="button" class="segmented-btn" id="moment-filter-immortal" data-i18n="momentsFilterImmortal">Inmortales</button>
+        </div>
+      </div>
+
+      <div id="moments-list" class="moments-list" aria-live="polite"></div>
     </div>
   </aside>
 

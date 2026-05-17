@@ -10,6 +10,9 @@ Base inicial mobile-first para una app de pareja en formato PWA, lista para GitH
 - Modos: dark y light
 - Idiomas: es y en
 - UI responsive (mobile-first)
+- Modulo funcional Momentos con timeline y filtros
+- Momentos con foto opcional, frase, nota, fecha/hora y estado emocional
+- Opcion para marcar momentos como inmortales
 - Service Worker para cache offline
 - Manifest PWA
 
@@ -32,4 +35,4 @@ Base inicial mobile-first para una app de pareja en formato PWA, lista para GitH
 
 ## Nota
 
-Esta version es la base visual y de configuracion. Los modulos funcionales se pueden agregar encima de esta arquitectura sin romper la personalizacion.
+Esta version ya incluye el primer modulo funcional (Momentos). Los siguientes modulos se pueden agregar encima de esta arquitectura sin romper la personalizacion.
