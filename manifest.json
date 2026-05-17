@@ -1,0 +1,26 @@
+{
+  "name": "Duality App",
+  "short_name": "Duality",
+  "description": "PWA para pareja con onboarding personalizado, temas adaptables e idioma ES/EN.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0D0D",
+  "theme_color": "#E02020",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

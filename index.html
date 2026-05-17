@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Duality App: una experiencia PWA para pareja con UI personalizada y temas adaptables.">
+  <meta name="theme-color" content="#0D0D0D" id="meta-theme-color">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Duality">
+  <title>Duality App</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="background-orb background-orb-a" aria-hidden="true"></div>
+  <div class="background-orb background-orb-b" aria-hidden="true"></div>
+
+  <section class="onboarding-screen" id="onboarding-screen" aria-label="Configuracion inicial">
+    <div class="onboarding-card glass-card">
+      <p class="kicker" data-i18n="onboardingKicker">Bienvenidos</p>
+      <h1 class="onboarding-title" data-i18n="onboardingTitle">Configura Duality para ustedes dos</h1>
+      <p class="onboarding-subtitle" data-i18n="onboardingSubtitle">Elige nombre, estilo, modo e idioma antes de empezar.</p>
+
+      <form id="onboarding-form" novalidate>
+        <label class="field-label" for="user-name" data-i18n="yourNameLabel">Tu nombre</label>
+        <input id="user-name" name="userName" type="text" maxlength="32" required data-i18n-placeholder="yourNamePlaceholder" placeholder="Tu nombre">
+
+        <label class="field-label" for="partner-name" data-i18n="partnerNameLabel">Nombre de tu pareja</label>
+        <input id="partner-name" name="partnerName" type="text" maxlength="32" required data-i18n-placeholder="partnerNamePlaceholder" placeholder="Nombre de tu pareja">
+
+        <div class="field-group">
+          <label class="field-label" for="language-select" data-i18n="languageLabel">Idioma</label>
+          <select id="language-select" name="language" aria-label="Idioma">
+            <option value="es">Espanol</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <p class="field-label" data-i18n="styleLabel">Estilo</p>
+          <div class="segmented" role="radiogroup" aria-label="Estilo">
+            <button type="button" class="segmented-btn" data-style="masculine" data-i18n="styleMasculine">Masculino</button>
+            <button type="button" class="segmented-btn" data-style="feminine" data-i18n="styleFeminine">Femenino</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <p class="field-label" data-i18n="modeLabel">Modo</p>
+          <div class="segmented" role="radiogroup" aria-label="Modo">
+            <button type="button" class="segmented-btn" data-mode="dark" data-i18n="modeDark">Oscuro</button>
+            <button type="button" class="segmented-btn" data-mode="light" data-i18n="modeLight">Claro</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" type="submit" data-i18n="continueButton">Continuar</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="app-shell" id="app-shell">
+    <header class="app-header glass-card">
+      <div>
+        <p class="kicker" data-i18n="headerKicker">Duality App</p>
+        <h1 class="brand-title">Duality<span class="brand-accent">.</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="language-toggle" class="icon-btn" aria-label="Cambiar idioma">ES</button>
+        <button id="theme-toggle" class="icon-btn" aria-label="Cambiar modo">Dark</button>
+        <button id="open-customize" class="icon-btn" aria-label="Personalizar">Tune</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="hero-panel glass-card reveal">
+        <p class="kicker" data-i18n="heroKicker">Espacio compartido</p>
+        <h2 class="hero-title"><span id="name-a">Tu</span> + <span id="name-b">Pareja</span></h2>
+        <p class="hero-script" id="hero-script">Sunday Vibe</p>
+        <p class="hero-copy" data-i18n="heroCopy">Tu tablero emocional y practico, listo para crecer con modulos.</p>
+      </section>
+
+      <section class="palette-panel glass-card reveal" aria-labelledby="palette-title">
+        <div class="panel-header">
+          <h3 id="palette-title" data-i18n="paletteTitle">Paleta activa</h3>
+          <span class="theme-chip" id="theme-name">Midnight Raven</span>
+        </div>
+        <p class="panel-copy" data-i18n="paletteCopy">Elige un matiz para personalizar el acento.</p>
+        <div class="swatches" id="swatches"></div>
+      </section>
+
+      <section class="modules-grid" aria-label="Modulos iniciales">
+        <article class="module-card reveal">
+          <p class="module-icon" aria-hidden="true">H</p>
+          <h3 data-i18n="moduleMomentsTitle">Momentos</h3>
+          <p data-i18n="moduleMomentsDesc">Timeline privado para recuerdos compartidos.</p>
+          <span class="pill" data-i18n="pillSoon">Proximamente</span>
+        </article>
+        <article class="module-card reveal">
+          <p class="module-icon" aria-hidden="true">G</p>
+          <h3 data-i18n="moduleGoalsTitle">Metas</h3>
+          <p data-i18n="moduleGoalsDesc">Objetivos de pareja con seguimiento visual.</p>
+          <span class="pill" data-i18n="pillSoon">Proximamente</span>
+        </article>
+        <article class="module-card reveal">
+          <p class="module-icon" aria-hidden="true">C</p>
+          <h3 data-i18n="moduleCalendarTitle">Calendario</h3>
+          <p data-i18n="moduleCalendarDesc">Fechas importantes, citas y planes.</p>
+          <span class="pill" data-i18n="pillSoon">Proximamente</span>
+        </article>
+        <article class="module-card reveal">
+          <p class="module-icon" aria-hidden="true">N</p>
+          <h3 data-i18n="moduleNotesTitle">Notas</h3>
+          <p data-i18n="moduleNotesDesc">Espacio colaborativo para ideas y acuerdos.</p>
+          <span class="pill" data-i18n="pillSoon">Proximamente</span>
+        </article>
+      </section>
+    </main>
+
+    <footer class="bottom-bar glass-card">
+      <button class="btn-secondary" id="install-button" hidden data-i18n="installButton">Instalar app</button>
+      <p class="footnote" data-i18n="footerNote">Base inicial lista para modulos funcionales y despliegue.</p>
+    </footer>
+  </div>
+
+  <aside class="customize-sheet" id="customize-sheet" aria-label="Panel de personalizacion" aria-hidden="true">
+    <div class="sheet-card glass-card">
+      <div class="sheet-header">
+        <h3 data-i18n="customizeTitle">Personalizacion</h3>
+        <button id="close-customize" class="icon-btn" aria-label="Cerrar">Close</button>
+      </div>
+
+      <label class="field-label" for="edit-user-name" data-i18n="yourNameLabel">Tu nombre</label>
+      <input id="edit-user-name" type="text" maxlength="32">
+
+      <label class="field-label" for="edit-partner-name" data-i18n="partnerNameLabel">Nombre de tu pareja</label>
+      <input id="edit-partner-name" type="text" maxlength="32">
+
+      <div class="sheet-row">
+        <div>
+          <p class="field-label" data-i18n="languageLabel">Idioma</p>
+          <select id="edit-language">
+            <option value="es">Espanol</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div>
+          <p class="field-label" data-i18n="modeLabel">Modo</p>
+          <div class="segmented compact">
+            <button type="button" class="segmented-btn" data-edit-mode="dark" data-i18n="modeDark">Oscuro</button>
+            <button type="button" class="segmented-btn" data-edit-mode="light" data-i18n="modeLight">Claro</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <p class="field-label" data-i18n="styleLabel">Estilo</p>
+        <div class="segmented">
+          <button type="button" class="segmented-btn" data-edit-style="masculine" data-i18n="styleMasculine">Masculino</button>
+          <button type="button" class="segmented-btn" data-edit-style="feminine" data-i18n="styleFeminine">Femenino</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="save-customize" data-i18n="saveSettings">Guardar cambios</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
